@@ -15,7 +15,7 @@ default_args = {
 }
 
 
-dag = DAG(dag_id="dag_with_task_group", schedule_interval=None, default_args=default_args)
+dag = DAG(dag_id="test_dag_with_task_group", schedule_interval=None, default_args=default_args)
 
 with dag:
     for i in range(3):
