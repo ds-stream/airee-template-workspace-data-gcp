@@ -6,7 +6,7 @@ on:
 
 env:
    USER: AireeApp1
-   WORKFLOW_ID: triggerapi.yaml
+   WORKFLOW_ID: build_image_worker.yaml
 
 jobs:
   trigger_rebuild_dag_image:
@@ -18,5 +18,5 @@ jobs:
       run: |
          curl -X POST -u ${USER}:${PAT_TOKEN} \
          -H "Accept: application/vnd.github.v3+json" \
-         --url https://api.github.com/repos/${GIT_REPO}/actions/workflows/${WORKFLOW_ID}/dispatches \
+         --url https://api.github.com/repos/${GIT_REPO}/actions/${WORKFLOW_ID}/dispatches \
          -d '{"ref":"main"}'
