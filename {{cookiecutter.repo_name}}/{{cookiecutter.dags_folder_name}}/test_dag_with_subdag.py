@@ -1,14 +1,10 @@
-import time
 from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from airflow.operators.subdag import SubDagOperator
 
+import example_tasks
 from test_subdag_factory import load_subdag
-
-
-def test(**context):
-    time.sleep(10)
 
 
 default_args = {
@@ -19,7 +15,7 @@ dag_id = "test_dag_with_subdag"
 dag = DAG(dag_id=dag_id, schedule_interval=None, default_args=default_args)
 
 with dag:
-    t1 = PythonOperator(task_id="task1", python_callable=test, provide_context=True)
+    t1 = PythonOperator(task_id="task1", python_callable=example_tasks.sleep_task, op_args=[10], provide_context=True)
 
     load_tasks = SubDagOperator(
         task_id="load_tasks",
