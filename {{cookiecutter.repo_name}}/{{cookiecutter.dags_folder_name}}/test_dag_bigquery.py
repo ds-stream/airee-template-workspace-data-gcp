@@ -10,8 +10,7 @@ from airflow.operators.dummy_operator import DummyOperator
 
 
 # other imports
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 # variables
 GCP_REGION = "us-east1"
@@ -39,7 +38,7 @@ default_args = {
     "gcp_conn_id": "google_cloud_default",
 }
 
-with DAG(dag_id="test_dag_bigquery", schedule_interval="@once", default_args=default_args) as dag:
+with DAG(dag_id="test_dag_bigquery", schedule_interval=None, default_args=default_args) as dag:
 
     # dummy operators - start and end tasks
     start = DummyOperator(task_id="start")
