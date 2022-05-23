@@ -33,7 +33,7 @@ def CPU_test():
 
 
 dag = DAG(
-    dag_id="CPU_stress_dag",
+    dag_id="stress_test_dag_cpu",
     description="CPU stress dag",
     schedule_interval=None,
     start_date=datetime(2022, 4, 20),

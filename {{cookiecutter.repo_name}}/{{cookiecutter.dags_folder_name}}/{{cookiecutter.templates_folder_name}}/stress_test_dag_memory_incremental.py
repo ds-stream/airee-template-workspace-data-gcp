@@ -5,26 +5,31 @@ from airflow.operators.python_operator import PythonOperator
 # other imports
 from datetime import datetime
 from time import time
+import psutil
 
 
 def eat_mem_test():
-    # time to run test in seconds
-    runtime = 120
-    # size [one GB]
-    GB = 1024 * 1024 * 1024
-    # set the size to test - integer number
-    size = 2
-    a = "a" * (size * GB)
-    # set time out
-    timeout = time() + runtime
+    # size [one MB]
+    MB = 1024 * 1024
+    # MB to add in each step
+    chunk_size = 512
+    # duration of each step
+    runtime = 60
+
     # run test
-    while True:
-        if time() > timeout:
-            break
+    for i in range(20):
+        size = chunk_size * MB * i
+        print(f"{size/MB} MB used", psutil.virtual_memory())
+        a = "a" * (size)
+
+        timeout = time() + runtime
+        while True:
+            if time() > timeout:
+                break
 
 
 dag = DAG(
-    dag_id="memory_stress_dag",
+    dag_id="stress_test_dag_memory_incremental",
     description="memory stress dag",
     schedule_interval=None,
     start_date=datetime(2022, 4, 20),
