@@ -10,7 +10,7 @@ env:
 
 jobs:
   trigger_rebuild_dag_image:
-    runs-on: self-hosted
+    runs-on: azure
     steps:
     - name: Define repo path
       run: echo "GIT_REPO=$(echo ${GITHUB_REPOSITORY} | sed -e 's/workspace_data_dev/app_dev/g')" >> $GITHUB_ENV
