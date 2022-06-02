@@ -10,7 +10,7 @@ def test(**context):
 
 default_args = {
     "owner": 'Airflow',
-    "start_date": datetime(2021, 1, 1),
+    "start_date": datetime(2022, 1, 1),
 }
 
 
