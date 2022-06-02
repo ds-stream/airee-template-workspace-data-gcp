@@ -1,11 +1,8 @@
-import time
 from datetime import datetime
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 
-
-def test(**context):
-    time.sleep(100)
+import example_tasks
 
 
 default_args = {
@@ -14,18 +11,11 @@ default_args = {
 }
 
 
-dag = DAG(
-    dag_id='test_100_task_1',
-    schedule_interval="0 * * * *",
-    default_args=default_args,
-    catchup=False
-)
+dag = DAG(dag_id="test_100_task_1", schedule_interval=None, default_args=default_args, catchup=False)
 
 
 with dag:
     for i in range(100):
         task = PythonOperator(
-            task_id=f"task_{i}",
-            python_callable=test,
-            provide_context=True
+            task_id=f"task_{i}", python_callable=example_tasks.sleep_task, op_args=[100], provide_context=True
         )
