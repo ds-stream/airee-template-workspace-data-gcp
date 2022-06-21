@@ -2,6 +2,6 @@
     "repo_name": "dags repo name",
     "dags_folder_name": "dags",
     "templates_folder_name": "templates",
-    "plugins_folder_name": "plugins"
-    
+    "plugins_folder_name": "plugins",
+    "labels": "airflow"
 }
