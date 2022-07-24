@@ -3,5 +3,6 @@
     "dags_folder_name": "dags",
     "templates_folder_name": "templates",
     "plugins_folder_name": "plugins",
-    "labels": "airflow"
+    "labels": "airflow",
+    "env": "dev"
 }
