@@ -26,6 +26,7 @@ on:
   push:
     paths:
       - 'dags/**'
+  workflow_dispatch:
 
 jobs:
   put_dags_nfs:
