@@ -1,4 +1,4 @@
-{% if cookiecutter.nfs_dags!=None %}
+{% if cookiecutter.nfs_dags==None %}
 name: Send request to rebuild dag image
 on:
   push:
