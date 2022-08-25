@@ -1,0 +1,62 @@
+{% if cookiecutter.nfs_dags!=None %}
+name: Send request to rebuild dag image
+on:
+  push:
+    paths:
+      - 'dags/**'
+
+env:
+   WORKFLOW_ID: build_image_worker.yaml
+
+jobs:
+  trigger_rebuild_dag_image:
+    runs-on: [self-hosted,{{cookiecutter.labels}}]
+    steps:
+    - name: Define repo path
+      run: echo "GIT_REPO=$(echo ${GITHUB_REPOSITORY} | sed -e 's/workspace_data_{{cookiecutter.env}}/app_{{cookiecutter.env}}/g')" >> $GITHUB_ENV
+    - name: trigger dag API
+      run: |
+         curl -X POST \
+         -H "Authorization: token {% raw %}${{ secrets.TF_VAR_github_token }}{% endraw %}" \
+         --url https://api.github.com/repos/${GIT_REPO}/actions/workflows/${WORKFLOW_ID}/dispatches \
+         -d '{"ref":"main"}'
+{% else %}
+name: Put DAGs files on NFS
+on:
+  push:
+    paths:
+      - 'dags/**'
+
+jobs:
+  put_dags_nfs:
+    runs-on: [self-hosted,{{cookiecutter.labels}}]
+    steps:
+    - name: Checkout repositor
+      uses: actions/checkout@v3
+      with:
+          fetch-depth: 0
+    - name: Get specific changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v29.0.0
+      with:
+        files: |
+          dags
+    - name: List changed files
+      run: |
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          echo "$file was changed"
+        done
+    - name: Set default project
+      run: gcloud config set project "{{cookiecutter.project_id}}"
+    - name: configure kubernetes connection
+      run: gcloud container clusters get-credentials "{{cookiecutter.cluster_name}}-{{cookiecutter.workspace}}" --region "{{cookiecutter.region}}" --project "{{cookiecutter.project_id}}"
+    - name: copy files to nfs using kubectl
+      run: |
+        if ${{ steps.changed-files.outputs.any_changed }}; then
+          webserver=$(kubectl get pods -n airflow --output=json -l app=airflow-webserver | jq .items[0].metadata.name -r)
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+            kubectl cp ${file} airflow/${webserver}:/opt/airflow/airflow_dags/
+            echo "$file was copied"
+          done
+        fi
+{% endif %}

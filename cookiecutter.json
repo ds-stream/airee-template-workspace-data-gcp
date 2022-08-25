@@ -4,5 +4,6 @@
     "templates_folder_name": "templates",
     "plugins_folder_name": "plugins",
     "labels": "airflow",
-    "env": "dev"
+    "env": "dev",
+    "nfs_dags": null
 }
