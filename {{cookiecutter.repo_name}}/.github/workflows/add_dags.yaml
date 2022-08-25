@@ -44,7 +44,7 @@ jobs:
           dags
     - name: List changed files
       run: |
-        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+        for file in {% raw %}${{ steps.changed-files.outputs.all_changed_files }}{% endraw %}; do
           echo "$file was changed"
         done
     - name: Set default project
@@ -55,7 +55,7 @@ jobs:
       run: |
         if ${{ steps.changed-files.outputs.any_changed }}; then
           webserver=$(kubectl get pods -n airflow --output=json -l app=airflow-webserver | jq .items[0].metadata.name -r)
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          for file in {% raw %}${{ steps.changed-files.outputs.all_changed_files }}{% endraw %}; do
             kubectl cp ${file} airflow/${webserver}:/opt/airflow/airflow_dags/
             echo "$file was copied"
           done
