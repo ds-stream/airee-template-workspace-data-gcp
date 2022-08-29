@@ -42,9 +42,14 @@ jobs:
       with:
         files: |
           dags
-    - name: List changed files
+    - name: List changed/added files
       run: |
         for file in {% raw %}${{ steps.changed-files.outputs.all_changed_files }}{% endraw %}; do
+          echo "$file was changed"
+        done
+    - name: List deleted files
+      run: |
+        for file in {% raw %}${{ steps.changed-files.outputs.deleted_files }}{% endraw %}; do
           echo "$file was changed"
         done
     - name: Set default project
@@ -56,8 +61,21 @@ jobs:
         if {% raw %}${{ steps.changed-files.outputs.any_changed }}{% endraw %}; then
           webserver=$(kubectl get pods -n airflow --output=json -l app=airflow-webserver | jq .items[0].metadata.name -r)
           for file in {% raw %}${{ steps.changed-files.outputs.all_changed_files }}{% endraw %}; do
-            kubectl cp ${file} airflow/${webserver}:/opt/airflow/airflow_dags/
+            DIR="$(dirname "${file}")"
+            echo "DIR : ${DIR}"
+            echo "Command : kubectl exec ${webserver} -n airflow -- bash -c 'mkdir -p /opt/airflow/airflow_dags/${DIR}/'"
+            kubectl exec ${webserver} -n airflow -- bash -c "mkdir -p /opt/airflow/airflow_dags/${DIR}/"
+            kubectl cp ${file} airflow/${webserver}:/opt/airflow/airflow_dags/${file}
             echo "$file was copied"
+          done
+        fi
+    - name: remove deleted files from nfs using kubectl
+      run: |
+        if {% raw %}${{ steps.changed-files.outputs.any_deleted }}{% endraw %}; then
+          webserver=$(kubectl get pods -n airflow --output=json -l app=airflow-webserver | jq .items[0].metadata.name -r)
+          for file in {% raw %}${{ steps.changed-files.outputs.deleted_files }}{% endraw %}; do
+            kubectl exec ${webserver} -n airflow -- bash -c "rm -f /opt/airflow/airflow_dags/${file}"
+            echo "$file was deleted"
           done
         fi
 {% endif %}
